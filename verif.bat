@@ -1,19 +1,34 @@
 @echo off
+echo Execution en tant que administrateur...
+
+:: Vérifier s'il s'agit d'une élévation avec privilèges déjà enregistrés
+>nul 2>&1 "%SYSTEMROOT%\system32\cacls.exe" "%SYSTEMROOT%\system32\config\system"
+
+:: Si l'erreur de cacls est 0 (pas d'erreur), alors nous avons déjà les privilèges administratifs.
+if '%errorlevel%' == '0' goto :continue
+
+:: Sinon, exécuter en tant qu'administrateur
+echo Set UAC = CreateObject^("Shell.Application"^) > "%temp%\getadmin.vbs"
+echo UAC.ShellExecute "%~s0", "", "", "runas", 1 >> "%temp%\getadmin.vbs"
+"%temp%\getadmin.vbs"
+exit /B
+
+:continue
+echo Execution en tant que administrateur reussie.
+
 setlocal enabledelayedexpansion
-title 🔍 Vérification Système Windows
+title  Vérification Système Windows
 color 0A
 
 :menu
 cls
-echo ------------------------------------------------
-echo I        VÉRIFICATION SYSTÈME WINDOWS          I
-echo I----------------------------------------------I
-echo I  [1] Vérification fichiers système (SFC)     I
-echo I  [2] Réparation image Windows (DISM)         I
-echo I  [3] Vérification complète (SFC + DISM)      I
-echo I  [4] Voir rapport détaillé (CBS.log)         I
-echo I  [0] Quitter                                 I
-echo ------------------------------------------------
+
+title VÉRIFICATION SYSTÈME WINDOWS
+echo [1] Vérification fichiers système (SFC)
+echo [2] Réparation image Windows (DISM)
+echo [3] Vérification complète (SFC + DISM)
+echo [4] Voir rapport détaillé (CBS.log)
+echo [0] Quitter
 echo.
 set /p choix="Votre choix : "
 
